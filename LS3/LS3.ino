@@ -1,25 +1,20 @@
-
 #include "linesensor.h"
 #include "beep.h"
 #include "motors.h"
 
 #define BAUD_RATE 9600
-// Pin definitions, to make the
-// code easier to read.
 
-
-
-//variable for time managment
 LineSensor_c Sensors;
 Beep_c Buzzer;
 Motors_c Motors;
+bool Met_Line = false;
 
+
+unsigned long value2;
+unsigned long value3;
+unsigned long value4;
 // the setup function runs once when you press reset or power the board
 void setup() {
-  // Set our motor driver pins as outputs.
-
-  
-  
   //Start a serial connection
   Serial.begin(BAUD_RATE);
   // Wait for stable connection, report reset.
@@ -34,25 +29,27 @@ void setup() {
   delay(2000);
 
 }
-
+unsigned long tmp = micros();
 void loop() {
 
-  Sensors.update_DN2();
-  Sensors.update_DN3();
-  Sensors.update_DN4(); 
-  Motors.update_motors();
+  Sensors.update_readings();
+  //Motors.update_motors();
      
   // Print output.
-  //Serial.print("DN2,3,4: " );
-  //Serial.print( Sensors.DN2_VALUE);
-  //Serial.print("," );
-  //Serial.print( Sensors.DN3_VALUE);
-  //Serial.print("," );
-  //Serial.print( Sensors.DN4_VALUE);
-  Serial.println(Motors.L_speedo);
-
-  Motors.L_speedo = Motors.L_speedo +10;
-  delay(100);
-
-
+  
+  Serial.print(micros()-tmp);
+  value2 = Sensors.DN2_VALUE;
+  value3 = Sensors.DN3_VALUE;
+  value4 = Sensors.DN4_VALUE;
+  tmp = micros();
+  Serial.print("   ");
+  Serial.print(" DN2,3,4: " );
+  Serial.print( value2);
+  Serial.print("," );
+  Serial.print( value3);
+  Serial.print("," );
+  Serial.print(value4);
+  Serial.print("\n ");
+  
+ 
   }
