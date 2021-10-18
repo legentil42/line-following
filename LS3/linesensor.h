@@ -30,6 +30,13 @@ class LineSensor_c {
     unsigned long DN2_VALUE = 0;
     unsigned long DN3_VALUE = 0;
     unsigned long DN4_VALUE = 0;
+
+    float WHITE_MEAN[3] = {0,0,0} ;
+    float BLACK_MEAN[3] = {1,1,1} ;
+
+    float DN2_NORM;
+    float DN3_NORM;
+    float DN4_NORM;
   
     // Constructor, must exist.
     LineSensor_c() {
@@ -82,6 +89,9 @@ class LineSensor_c {
           }
           if (done2 == true && done3 == true && done4 == true) {
               sensor_step = 0;
+                DN2_NORM = (DN2_VALUE - WHITE_MEAN[0])/BLACK_MEAN[0];
+                DN3_NORM = (DN3_VALUE - WHITE_MEAN[1])/BLACK_MEAN[1];
+                DN4_NORM = (DN4_VALUE - WHITE_MEAN[2])/BLACK_MEAN[2];
           }
       }
 
@@ -104,6 +114,41 @@ class LineSensor_c {
         }
     }
 
+
+    void white_calibration(){
+
+        for (int i = 0; i < 100; i++) {
+            update_readings();
+            WHITE_MEAN[0] = WHITE_MEAN[0] + DN2_VALUE;
+            WHITE_MEAN[1] = WHITE_MEAN[1] + DN3_VALUE;
+            WHITE_MEAN[2] = WHITE_MEAN[2] + DN4_VALUE;
+          }
+          
+        WHITE_MEAN[0] = WHITE_MEAN[0]/100;
+        WHITE_MEAN[1] = WHITE_MEAN[1]/100;
+        WHITE_MEAN[2] = WHITE_MEAN[2]/100;
+              
+    }
+
+    void find_black_line() { // robot go forward until it finds a line
+     while (DN2_VALUE < 2000 && DN3_VALUE < 2000 && DN4_VALUE < 2000){
+        update_readings();
+     }
+    }
+
+
+    void black_calibration() {
+       for (int i = 0; i < 5; i++) {
+            update_readings();
+            BLACK_MEAN[0] = BLACK_MEAN[0] + DN2_VALUE - WHITE_MEAN[0];
+            BLACK_MEAN[1] = BLACK_MEAN[1] + DN3_VALUE - WHITE_MEAN[1];
+            BLACK_MEAN[2] = BLACK_MEAN[2] + DN4_VALUE - WHITE_MEAN[2];
+          }
+        BLACK_MEAN[0] = BLACK_MEAN[0]/5;
+        BLACK_MEAN[1] = BLACK_MEAN[1]/5;
+        BLACK_MEAN[2] = BLACK_MEAN[2]/5;
+
+    }
 };
 
 
