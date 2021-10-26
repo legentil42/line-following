@@ -13,12 +13,17 @@
 // Class to operate the linesensor(s).
 class LineSensor_c {
   public:
+
+
+    #include "motors.h"
+    Motors_c Motors;
     unsigned long Timer_charge = micros();
     int sensor_step = 0;
     bool done2 = false;
     bool done3 = false;
     bool done4 = false;
     unsigned long reading_timer = micros();
+    float Total;
 
     unsigned long elapsed_time;
     //step 0 : charge capacitors and reset Timer_charge
@@ -31,8 +36,8 @@ class LineSensor_c {
     unsigned long DN3_VALUE = 0;
     unsigned long DN4_VALUE = 0;
 
-    float WHITE_MEAN[3] = {0,0,0} ;
-    float BLACK_MEAN[3] = {1,1,1} ;
+    float WHITE_MEAN[3] = {4000,4000,4000};
+
 
     float DN2_NORM;
     float DN3_NORM;
@@ -88,10 +93,11 @@ class LineSensor_c {
           }
           }
           if (done2 == true && done3 == true && done4 == true) {
-              sensor_step = 0;
-                DN2_NORM = (DN2_VALUE - WHITE_MEAN[0])/BLACK_MEAN[0];
-                DN3_NORM = (DN3_VALUE - WHITE_MEAN[1])/BLACK_MEAN[1];
-                DN4_NORM = (DN4_VALUE - WHITE_MEAN[2])/BLACK_MEAN[2];
+                sensor_step = 0;
+                Total = DN2_VALUE+DN3_VALUE+DN4_VALUE;
+                DN2_NORM = map(DN2_VALUE,WHITE_MEAN[0],Total,0,255);
+                DN3_NORM = map(DN3_VALUE,WHITE_MEAN[1],Total,0,255);
+                DN4_NORM = map(DN4_VALUE,WHITE_MEAN[2],Total,0,255);
           }
       }
 
@@ -116,19 +122,14 @@ class LineSensor_c {
 
 
     void white_calibration(){
-
-        for (int i = 0; i < 100; i++) {
-            update_readings();
-            WHITE_MEAN[0] = WHITE_MEAN[0] + DN2_VALUE;
-            WHITE_MEAN[1] = WHITE_MEAN[1] + DN3_VALUE;
-            WHITE_MEAN[2] = WHITE_MEAN[2] + DN4_VALUE;
-          }
-          
-        WHITE_MEAN[0] = WHITE_MEAN[0]/100;
-        WHITE_MEAN[1] = WHITE_MEAN[1]/100;
-        WHITE_MEAN[2] = WHITE_MEAN[2]/100;
+      
+      update_readings();
+      if (WHITE_MEAN[0] > DN2_VALUE) {WHITE_MEAN[0] = DN2_VALUE;}
+      if (WHITE_MEAN[1] > DN3_VALUE) {WHITE_MEAN[1] = DN3_VALUE;}
+      if (WHITE_MEAN[2] > DN4_VALUE) {WHITE_MEAN[2] = DN4_VALUE;}
+      }
               
-    }
+   
 
     void find_black_line() { // robot go forward until it finds a line
      while (DN2_VALUE < 2000 && DN3_VALUE < 2000 && DN4_VALUE < 2000){
@@ -136,18 +137,15 @@ class LineSensor_c {
      }
     }
 
+    void follow_line() {
+          Motors.L_speedo =  DN4_NORM*0.5  + (DN3_NORM-100)*0.20;
+          Motors.R_speedo =  DN2_NORM*0.5  + (DN3_NORM-100)*0.20;
+      
+          if (DN4_NORM> DN3_NORM && DN4_NORM> DN2_NORM) { Motors.R_speedo = -20;}
+          if (DN2_NORM> DN3_NORM && DN2_NORM> DN4_NORM) { Motors.L_speedo = -20;}
+          Motors.update_motors();
 
-    void black_calibration() {
-       for (int i = 0; i < 5; i++) {
-            update_readings();
-            BLACK_MEAN[0] = BLACK_MEAN[0] + DN2_VALUE - WHITE_MEAN[0];
-            BLACK_MEAN[1] = BLACK_MEAN[1] + DN3_VALUE - WHITE_MEAN[1];
-            BLACK_MEAN[2] = BLACK_MEAN[2] + DN4_VALUE - WHITE_MEAN[2];
-          }
-        BLACK_MEAN[0] = BLACK_MEAN[0]/5;
-        BLACK_MEAN[1] = BLACK_MEAN[1]/5;
-        BLACK_MEAN[2] = BLACK_MEAN[2]/5;
-
+      
     }
 };
 
