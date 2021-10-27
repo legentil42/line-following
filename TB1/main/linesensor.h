@@ -124,29 +124,21 @@ class LineSensor_c {
     void white_calibration(){
       
       update_readings();
-      if (WHITE_MEAN[0] > DN2_VALUE) {WHITE_MEAN[0] = DN2_VALUE;}
-      if (WHITE_MEAN[1] > DN3_VALUE) {WHITE_MEAN[1] = DN3_VALUE;}
-      if (WHITE_MEAN[2] > DN4_VALUE) {WHITE_MEAN[2] = DN4_VALUE;}
+      if (WHITE_MEAN[0] > DN2_VALUE && DN2_VALUE != 0) {
+      WHITE_MEAN[0] = DN2_VALUE;
+      }
+      if (WHITE_MEAN[1] > DN3_VALUE && DN3_VALUE != 0) {
+        
+        WHITE_MEAN[1] = DN3_VALUE;
+        }
+      if (WHITE_MEAN[2] > DN4_VALUE && DN4_VALUE != 0) {
+        WHITE_MEAN[2] = DN4_VALUE;
+        }
       }
               
    
 
-    void find_black_line() { // robot go forward until it finds a line
-     while (DN2_VALUE < 2000 && DN3_VALUE < 2000 && DN4_VALUE < 2000){
-        update_readings();
-     }
-    }
 
-    void follow_line() {
-          Motors.L_speedo =  DN4_NORM*0.5  + (DN3_NORM-100)*0.20;
-          Motors.R_speedo =  DN2_NORM*0.5  + (DN3_NORM-100)*0.20;
-      
-          if (DN4_NORM> DN3_NORM && DN4_NORM> DN2_NORM) { Motors.R_speedo = -20;}
-          if (DN2_NORM> DN3_NORM && DN2_NORM> DN4_NORM) { Motors.L_speedo = -20;}
-          Motors.update_motors();
-
-      
-    }
 };
 
 
