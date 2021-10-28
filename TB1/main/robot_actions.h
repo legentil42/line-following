@@ -12,21 +12,23 @@ class Robot_actions_c {
     Motors_c Motors;
     #include "linesensor.h"
     LineSensor_c Sensors;
-
+    #include "beep.h"
+    Beep_c Buzzer;
     
     void go_straight() {
-      /*
-        Serial.print(Sensors.DN4_VALUE);
+      
+
+        Serial.print(count_e0);
         Serial.print(", ");
-        Serial.print(Sensors.WHITE_MEAN[2]);
-        Serial.print(", ");
-        Serial.println(Sensors.DN4_VALUE-Sensors.WHITE_MEAN[2]);
-        */
+        Serial.println(count_e1);
+        
         Sensors.white_calibration();
         Sensors.update_readings();
-        Serial.println(state_e0);
-        Motors.L_speedo = 50+ (count_e0-count_e1)*3;
-        Motors.R_speedo = 50+ (count_e1-count_e0)*3;
+        
+        //Buzzer.buzz(Sensors.DN2_VALUE,100);
+        
+        Motors.L_speedo = 50+ (-count_e0+count_e1)*1;
+        Motors.R_speedo = 50+ (-count_e1+count_e0)* 1;
       
         Motors.update_motors();
         
@@ -45,13 +47,13 @@ class Robot_actions_c {
           Sensors.update_readings();      
           Motors.L_speedo =  20+Sensors.DN4_NORM*0.5;// + (Sensors.DN3_NORM-100)*0.20;
           Motors.R_speedo =  20+Sensors.DN2_NORM*0.5;//  + (Sensors.DN3_NORM-100)*0.20;
-
+          /*
           Serial.print(Sensors.DN2_NORM);
           Serial.print(", ");
           Serial.print(Sensors.DN3_NORM);
           Serial.print(", ");
           Serial.println(Sensors.DN4_NORM);
-          
+          */
           if (Sensors.DN4_NORM> Sensors.DN3_NORM && Sensors.DN4_NORM> Sensors.DN2_NORM) { Motors.R_speedo = -20;}
           if (Sensors.DN2_NORM> Sensors.DN3_NORM && Sensors.DN2_NORM> Sensors.DN4_NORM) { Motors.L_speedo = -20;}
           Motors.update_motors();

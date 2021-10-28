@@ -31,15 +31,14 @@ void setup() {
 
 
 void loop() {
-  /*
-  Serial.print(state);
-  Serial.print("," );
-  */
+ 
+   
   if (state == state_find_line) {
-      Actions.go_straight();
+      Actions.go_straight();      
       if (Actions.check_for_line() == true) {
         state = state_follow_line;
       }
+      
   }
   
   if (state == state_follow_line) {
@@ -48,14 +47,7 @@ void loop() {
   
 
   // Print output.
-  /*
-  Serial.print(count_e0);
-  Serial.print("," );
-  Serial.print(state_e0);
-  Serial.print("," );
-  Serial.print(count_e1);
-  Serial.print("\n ");
-  */
+
     
     
     
