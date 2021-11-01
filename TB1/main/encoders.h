@@ -44,28 +44,28 @@ ISR( INT6_vect ) {
     // Complete this if statement as necessary.
     // Refer to the labsheet. 
     if( state_e0 == 1 ) {
-    count_e0 = count_e0 + 1;
+    count_e0 = count_e0 - 1;
     }
     else if( state_e0 == 2 ) {
-    count_e0 = count_e0 - 1;
+    count_e0 = count_e0 + 1;
     }
     else if( state_e0 == 4 ) {
-    count_e0 = count_e0 - 1;
+    count_e0 = count_e0 + 1;
     }
     else if( state_e0 == 7 ) {
-    count_e0 = count_e0 + 1;
+    count_e0 = count_e0 - 1;
     }
     else if( state_e0 == 8 ) {
-    count_e0 = count_e0 + 1;
+    count_e0 = count_e0 - 1;
     }
     else if( state_e0 == 11 ) {
-    count_e0 = count_e0 - 1;
+    count_e0 = count_e0 + 1;
     }
     else if( state_e0 == 13 ) {
-    count_e0 = count_e0 - 1;
+    count_e0 = count_e0 + 1;
     }
     else if( state_e0 == 14 ) {
-    count_e0 = count_e0 + 1;
+    count_e0 = count_e0 - 1;
     }// Continue this if statement as necessary.
 
     // Shift the current readings (bits 3 and 2) down
@@ -118,28 +118,28 @@ ISR( PCINT0_vect ) {
     // Complete this if statement as necessary.
     // Refer to the labsheet. 
     if( state_e1 == 1 ) {
-    count_e1 = count_e1 + 1;
+    count_e1 = count_e1 - 1;
     }
     else if( state_e1 == 2 ) {
-    count_e1 = count_e1 - 1;
+    count_e1 = count_e1 + 1;
     }
     else if( state_e1 == 4 ) {
-    count_e1 = count_e1 - 1;
+    count_e1 = count_e1 + 1;
     }
     else if( state_e1 == 7 ) {
-    count_e1 = count_e1 + 1;
+    count_e1 = count_e1 - 1;
     }
     else if( state_e1 == 8 ) {
-    count_e1 = count_e1 + 1;
+    count_e1 = count_e1 - 1;
     }
     else if( state_e1 == 11 ) {
-    count_e1 = count_e1 - 1;
+    count_e1 = count_e1 + 1;
     }
     else if( state_e1 == 13 ) {
-    count_e1 = count_e1 - 1;
+    count_e1 = count_e1 + 1;
     }
     else if( state_e1 == 14 ) {
-    count_e1 = count_e1 + 1;
+    count_e1 = count_e1 - 1;
     }
     
     // Continue this if statement as necessary.

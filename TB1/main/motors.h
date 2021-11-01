@@ -1,4 +1,4 @@
-// this #ifndef stops this file
+// this #ifndef stops this filese
 // from being included mored than
 // once by the compiler. 
 //#ifndef _MOTORS_H
