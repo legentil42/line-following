@@ -52,10 +52,10 @@ void setup() {
   Actions.reset_count();
   float min_dist = sqrt(sq(Kin.X)+sq(Kin.Y));
   while(min_dist <= sqrt(sq(Kin.X)+sq(Kin.Y))){
-      
+      /*
       Serial.print(min_dist);
       Serial.print(" ,");
-      Serial.println(sqrt(sq(Kin.X)+sq(Kin.Y)));
+      Serial.println(sqrt(sq(Kin.X)+sq(Kin.Y)));*/
       if (min_dist >= sqrt(sq(Kin.X)+sq(Kin.Y))) {
         min_dist = sqrt(sq(Kin.X)+sq(Kin.Y));
       }
