@@ -10,7 +10,7 @@
 #define state_find_line 0
 #define state_follow_line 1
 #define state_double_back 2
-
+#define PI 3.1415926535897932384626433832795
 Beep_c Buzzer;
 Robot_actions_c Actions;
 Motors_c Motors;
@@ -19,7 +19,8 @@ Kinematics_c Kin;
 
 PID_c Left_PID;
 PID_c Right_PID;
-PID_c Home_PID;
+PID_c Home_dist_PID;
+PID_c Home_angle_PID;
 
 LineSensor_c Sensors;
 
@@ -37,37 +38,50 @@ void setup() {
   setupEncoder0();
   setupEncoder1();
   delay(500);
-  //Buzzer.buzz(1911,100);
-  //Buzzer.buzz(1517,100);
+  Buzzer.buzz(1911,100);
+  Buzzer.buzz(1517,100);
 
   delay(500);
+
+
 
 }
 
 
-
+  float old_theta = 0;
 void loop() {
+  
     Kin.update();
     Sensors.white_calibration();
-    Sensors.update_readings();   
-
-    Home_PID.K_p = 0.01;
-    Home_PID.K_i = 0;
-    Home_PID.K_d = 0;
-    Home_PID.demand = 1000.0;
-    Home_PID.value = Kin.X;
-    Home_PID.calculate_command();
+    Sensors.update_readings(); 
+    Motors.update_motors();   
     
-    Serial.print(Home_PID.value);
+  if (abs(PI-(Kin.theta-old_theta)) > 0.03*PI ) {
+    Home_angle_PID.K_p = 1;
+    Home_angle_PID.K_i = 0;
+    Home_angle_PID.K_d = 0;
+    Home_angle_PID.demand = PI;
+    Home_angle_PID.demand = Home_angle_PID.demand;
+    Home_angle_PID.value = Kin.theta;
+    Home_angle_PID.calculate_command();
+    
+
+
+    Left_PID.demand = 0.7*Home_angle_PID.command;
+    Right_PID.demand = -0.7*Home_angle_PID.command;
+
+    Serial.print(Left_PID.command);
     Serial.print(",");
-    Serial.println(Home_PID.demand);
-
+    Serial.print(Left_PID.demand);
+    Serial.print(",");
+    Serial.print(Home_angle_PID.value);
+    Serial.print(",");
+    Serial.println(Home_angle_PID.demand);
     
-    Kin.update();
-    Left_PID.K_p = 10;
-    Left_PID.K_i = 0.008;
+    Left_PID.K_p = 25;
+    Left_PID.K_i = 0.002;
     Left_PID.K_d = 10;
-    Left_PID.demand = 0.1*Home_PID.command;
+    
     Left_PID.value = Kin.Ang_speed_e1;
     Left_PID.calculate_command();
     Motors.L_speedo = Left_PID.command;
@@ -78,14 +92,37 @@ void loop() {
     Serial.println(Left_PID.demand);
 */
 
-    Right_PID.K_p = 10;
-    Right_PID.K_i = 0.008;
+    Right_PID.K_p = 25;
+    Right_PID.K_i = 0.002;
     Right_PID.K_d = 10;
-    Right_PID.demand = 0.1*Home_PID.command;
+    
     Right_PID.value = Kin.Ang_speed_e0;
     Right_PID.calculate_command();
     Motors.R_speedo = Right_PID.command;
+  }
+  else{
+    Left_PID.demand = 0;
+    Right_PID.demand = 0;
+    Motors.R_speedo = 0;
+    Motors.L_speedo = 0;
+  }
 
-    Motors.update_motors();    
+/*
+    Home_dist_PID.K_p = 40;
+    Home_dist_PID.K_i = 0;
+    Home_dist_PID.K_d = 10;
+    Home_dist_PID.demand = 1000.0;
+    Home_dist_PID.demand = 0.95*Home_dist_PID.demand;
+    Home_dist_PID.value = sqrt(pow(Kin.X,2)+pow(Kin.Y,2));
+    Home_dist_PID.calculate_command();
+    
+    Serial.print(Home_dist_PID.value);
+    Serial.print(",");
+    Serial.println(Home_dist_PID.demand);
+*/
+    
+
+
+  
 
   } 
