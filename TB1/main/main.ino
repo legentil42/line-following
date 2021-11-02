@@ -11,6 +11,8 @@
 Beep_c Buzzer;
 Robot_actions_c Actions;
 //Motors_c Motors;
+
+
 int state = state_find_line;
 int lost_line = 0;
 bool double_backed = true;
@@ -29,25 +31,22 @@ void setup() {
   Buzzer.buzz(1517,100);
 
   delay(500);
-  Actions.go_X_distance(0);
+
 }
 
 
 
 void loop() {
-  
-    Actions.show_pos();
 
-  /*
     Serial.print(state);
-    Serial.print(",");
+    Serial.println(",");
   if (state == state_find_line) {
       Actions.go_straight();   
       if (Actions.check_for_line() == true) {
         state = state_follow_line;
         
       }
-      if (double_backed == false && millis()-Actions.lost_line_time >2500) {
+      if (double_backed == false && millis()-Actions.lost_line_time >1000) {
         Actions.turn_on_spot();
         double_backed = true;
       }
@@ -66,14 +65,14 @@ void loop() {
   
   
   if (state == state_double_back) {
-    Actions.turn_on_spot();
+    Actions.turn_theta_degrees(180);
     if (Actions.check_for_line() == true) {
         state = state_follow_line;
 
       }
   }
-
+      
     
     
-    */
+    
   } 
