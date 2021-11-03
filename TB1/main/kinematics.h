@@ -34,9 +34,8 @@ class Kinematics_c {
     // Use this function to update
     // your kinematics
     void update() {
-        t1 = millis();
-          if (t1-t0 > 20){
-          Dt = t1-t0;
+          if (millis()-t0 > 20){
+          Dt = millis()-t0;
           phi_e1 = float((count_e1 - old_e1)/358.3);
           phi_e0 = float((count_e0 - old_e0)/358.3);
 
@@ -63,14 +62,15 @@ class Kinematics_c {
           theta = theta + thetapr;      //*(Dt/1000.0);
           Y = Y + Xpr * sin(theta);       //*(Dt/1000.0);
           X = X + Xpr * cos(theta);       //*(Dt/1000.0);
-          /*
-          Serial.print(X);
+
           
+
+          Serial.print(X);
           Serial.print(", ");
           Serial.print(Y);
           Serial.print(", ");
           Serial.println(theta);
-          */
+          
           }
     }
 
