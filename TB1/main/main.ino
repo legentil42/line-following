@@ -20,6 +20,52 @@ Beep_c Buzzer;
 Robot_actions_c Actions;
 Motors_c Motors;
 
+unsigned long TT_duree;  
+unsigned long TT_pitch;
+bool OnOrOff = true;
+
+int D=3405;
+int Ds=3214;
+int E=3033;
+int F=2863;
+int Fs=2702;
+int G=2551;
+int Gs=2407;
+int A=2272;
+int As=2145;
+int B=2024;
+int Cp=1911;
+int Cps=1803;
+int Dp=1702;
+
+
+
+
+//sweat dreams
+/*int notes[14]={F,F,D,F,F,E,F,F,F,D,F,G,F,E};
+int temps[14]={4,4,4,8,4,2,8,4,4,4,8,4,8,4};
+*/
+
+// all star 
+int notes[23]={G,Dp,B,B,A,G,G,Cp,B,B,A,A,G,G,Dp,B,B,A,A,G,G,E,D};
+int temps[23]={4,8,8,4,8,8,8,4,8,8,8,8,4,8,8,8,8,8,8,8,8,4,4};
+
+// Remember: Setup only runs once when the arduino is powered up.
+void music() {
+
+
+   pinMode(6, OUTPUT );
+
+
+
+    for (int thisNote = 0; thisNote < 23; thisNote++) {
+        int noteDuration = 2000/temps[thisNote];
+        Buzzer.buzz(notes[thisNote],noteDuration);
+      }
+
+}
+
+
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -34,13 +80,15 @@ void setup() {
   Buzzer.buzz(1911,100);
   Buzzer.buzz(1517,100);
 
+  delay(1000);
+
 }
 float last_theta = 0;
 int state = state_find_line;
 int lost_line = 0;
 bool double_backed = true;
 unsigned long time_lost_line = millis();
-float X_limit = 450;
+float X_limit = 1200;
 float new_theta;
 void loop() {
   /*
@@ -58,7 +106,7 @@ void loop() {
         state = state_follow_line;
       }
 
-      if (double_backed == false && millis()-time_lost_line > 750 && Actions.Kin.X < X_limit) {
+      if (double_backed == false && millis()-time_lost_line > 900 && Actions.Kin.X < X_limit) {
 
         new_theta = Actions.turn_theta_rad(last_theta+PI);
 
@@ -66,7 +114,7 @@ void loop() {
         double_backed = true;
       }
 
-      if (Actions.Kin.X > X_limit) {
+      if (Actions.Kin.X > X_limit && millis()-time_lost_line > 300) {
         Motors.L_speedo = 0;
         Motors.R_speedo = 0;
         Motors.update_motors();
@@ -105,13 +153,14 @@ void loop() {
         delay(200);
         Buzzer.buzz(1200,100);
         Buzzer.buzz(1000,100);
-        while (Actions.Kin.X >0){
+        while (Actions.Kin.X >200){
           Actions.go_straight(new_theta);
         }
         Motors.L_speedo = 0;
         Motors.R_speedo = 0;
         Motors.update_motors();
        state = finished;
+       music();
     }
 
      
@@ -119,10 +168,7 @@ void loop() {
    
 
     if (state == finished) {
-      
-    Buzzer.buzz(1911,100);
-    Buzzer.buzz(1517,200);
-    Buzzer.buzz(1911,100);
+
     }
 
 }

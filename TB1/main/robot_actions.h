@@ -108,11 +108,11 @@ class Robot_actions_c {
     Home_dist_PID.K_d = 0;
     Home_dist_PID.demand = desired_distance;
     
-    Left_PID.K_p = 20;
+    Left_PID.K_p = 10;
     Left_PID.K_i = 0.0004;
     Left_PID.K_d = 1;
 
-    Right_PID.K_p = 20;
+    Right_PID.K_p = 10;
     Right_PID.K_i = 0.0004;
     Right_PID.K_d = 1;    
     unsigned long t0 = millis();
@@ -169,11 +169,11 @@ class Robot_actions_c {
     Home_angle_PID.K_d = 0;
     Home_angle_PID.demand = desired_theta;
     
-    Left_PID.K_p = 15;
+    Left_PID.K_p = 10;
     Left_PID.K_i = 0.001;
     Left_PID.K_d = 2;
 
-    Right_PID.K_p = 15;
+    Right_PID.K_p = 10;
     Right_PID.K_i = 0.001;
     Right_PID.K_d = 2;    
     unsigned long t0 = millis();
@@ -186,8 +186,8 @@ class Robot_actions_c {
     Home_angle_PID.calculate_command();
 
 
-    Left_PID.demand = 0.12*Home_angle_PID.command;
-    Right_PID.demand = -0.12*Home_angle_PID.command;
+    Left_PID.demand = 0.1*Home_angle_PID.command;
+    Right_PID.demand = -0.1*Home_angle_PID.command;
 /*
     Serial.print(Left_PID.command);
     Serial.print(",");
@@ -205,7 +205,7 @@ class Robot_actions_c {
 
     Right_PID.value = Kin.Ang_speed_e0;
     Right_PID.calculate_command();
-    Motors.R_speedo = 2*Right_PID.command;
+    Motors.R_speedo = -2*Left_PID.command;
 
     Motors.update_motors();
     
