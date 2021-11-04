@@ -25,26 +25,13 @@ class Robot_actions_c {
     unsigned long lost_line_time = millis();
     
     
-    void go_straight() {
-        
+    void go_straight(float theta_goal) {
         Kin.update();
           Sensors.white_calibration();
           Sensors.update_readings();   
-          /*
-          Serial.print(Sensors.DN2_VALUE-Sensors.WHITE_MEAN[0]);
-          Serial.print(", ");
-          Serial.print(Sensors.DN3_VALUE-Sensors.WHITE_MEAN[1]);
-          Serial.print(", ");
-          Serial.println(Sensors.DN4_VALUE-Sensors.WHITE_MEAN[2]);
-          */
-        /*      
-        Serial.print(count_e0);
-        Serial.print(", ");
-        Serial.println(count_e1);*/
-        //Buzzer.buzz(Sensors.DN2_VALUE,100);
-        
-        Motors.L_speedo = 50+ (count_e0-count_e1)*1;
-        Motors.R_speedo = 50+ (count_e1-count_e0)* 1;
+
+        Motors.L_speedo = 30- (Kin.theta-theta_goal)*20;
+        Motors.R_speedo = 30+ (Kin.theta-theta_goal)*20;
       
         Motors.update_motors();
         
@@ -67,15 +54,15 @@ class Robot_actions_c {
 
           Sensors.white_calibration();
           Sensors.update_readings();      
-          Motors.L_speedo =  20+Sensors.DN4_NORM*0.5;// + (Sensors.DN3_NORM-100)*0.20;
-          Motors.R_speedo =  20+Sensors.DN2_NORM*0.5;//  + (Sensors.DN3_NORM-100)*0.20;
-          
+          Motors.L_speedo =  10+Sensors.DN4_NORM*0.5;// + (Sensors.DN3_NORM-100)*0.20;
+          Motors.R_speedo =  10+Sensors.DN2_NORM*0.5;//  + (Sensors.DN3_NORM-100)*0.20;
+          /*
           Serial.print(Sensors.DN2_VALUE-Sensors.WHITE_MEAN[0]);
           Serial.print(", ");
           Serial.print(Sensors.DN3_VALUE-Sensors.WHITE_MEAN[1]);
           Serial.print(", ");
           Serial.println(Sensors.DN4_VALUE-Sensors.WHITE_MEAN[2]);
-          
+          */
           if (Sensors.DN4_NORM> Sensors.DN3_NORM && Sensors.DN4_NORM> Sensors.DN2_NORM) { Motors.R_speedo = -20;}
           if (Sensors.DN2_NORM> Sensors.DN3_NORM && Sensors.DN2_NORM> Sensors.DN4_NORM) { Motors.L_speedo = -20;}
           Motors.update_motors();
@@ -96,13 +83,11 @@ class Robot_actions_c {
       
         if (Sensors.DN4_VALUE-Sensors.WHITE_MEAN[2]> 600 && Sensors.DN3_VALUE-Sensors.WHITE_MEAN[1]> 600 && Sensors.DN2_VALUE-Sensors.WHITE_MEAN[0]> 600){
             is_on_line = true;
-            lost_line_time = millis();
             return true;
         }
         else if (Sensors.DN4_VALUE-Sensors.WHITE_MEAN[2]< 600 && Sensors.DN3_VALUE-Sensors.WHITE_MEAN[1]< 600 && Sensors.DN2_VALUE-Sensors.WHITE_MEAN[0]< 600)
         { 
           if (is_on_line == true) {
-                lost_line_time = millis();
                 is_on_line = false;
           }
           
@@ -143,13 +128,13 @@ class Robot_actions_c {
     Left_PID.demand = 0.005*Home_dist_PID.command;
     Right_PID.demand = 0.005*Home_dist_PID.command;
 
-
+/*
     Serial.print(sqrt(pow(Kin.X-old_X,2)+pow(Kin.Y-old_Y,2)));
     Serial.print(",");
     Serial.print(Home_dist_PID.value);
     Serial.print(",");
     Serial.println(Home_dist_PID.demand);
-    
+    */
 
     
     Left_PID.value = Kin.Ang_speed_e1;
@@ -172,24 +157,27 @@ class Robot_actions_c {
     }
     
 
-    void turn_theta_rad(float desired_theta) {
-      
-    float old_theta = Kin.theta;
+    float turn_theta_rad(float desired_theta) {
+    Home_angle_PID.sum_of_err = 0;
+    Left_PID.sum_of_err = 0;
+    Right_PID.sum_of_err = 0;
     Kin.update();
+    float old_theta = Kin.theta;
+    
     Home_angle_PID.K_p = 3;
     Home_angle_PID.K_i = 0.0005;
     Home_angle_PID.K_d = 0;
     Home_angle_PID.demand = desired_theta;
     
-    Left_PID.K_p = 20;
-    Left_PID.K_i = 0.0004;
-    Left_PID.K_d = 1;
+    Left_PID.K_p = 15;
+    Left_PID.K_i = 0.001;
+    Left_PID.K_d = 2;
 
-    Right_PID.K_p = 20;
-    Right_PID.K_i = 0.0004;
-    Right_PID.K_d = 1;    
+    Right_PID.K_p = 15;
+    Right_PID.K_i = 0.001;
+    Right_PID.K_d = 2;    
     unsigned long t0 = millis();
-  while (abs(Kin.theta - desired_theta) > 0.3 ) {
+  while (abs(Kin.theta - desired_theta) > 0.2 ) {
     Kin.update();
     if (millis()-t0 > 40){
     t0 = millis();
@@ -198,9 +186,9 @@ class Robot_actions_c {
     Home_angle_PID.calculate_command();
 
 
-    Left_PID.demand = 0.2*Home_angle_PID.command;
-    Right_PID.demand = -0.2*Home_angle_PID.command;
-
+    Left_PID.demand = 0.12*Home_angle_PID.command;
+    Right_PID.demand = -0.12*Home_angle_PID.command;
+/*
     Serial.print(Left_PID.command);
     Serial.print(",");
     Serial.print(Left_PID.demand);
@@ -208,7 +196,7 @@ class Robot_actions_c {
     Serial.print(Home_angle_PID.value);
     Serial.print(",");
     Serial.println(Home_angle_PID.demand);
-    
+    */
 
     
     Left_PID.value = Kin.Ang_speed_e1;
@@ -227,7 +215,7 @@ class Robot_actions_c {
         Motors.R_speedo = 0;
       
         Motors.update_motors();
-        
+        return -0.35+desired_theta;
     }
     void show_pos() {
 

@@ -2,7 +2,6 @@
 #include "beep.h"
 #include "motors.h"
 #include "encoders.h"
-#include "kinematics.h"
 #include "robot_actions.h"
 #define BAUD_RATE 9600
 #define state_find_line 0
@@ -14,15 +13,13 @@
 #define state_find_line 0
 #define state_follow_line 1
 #define state_double_back 2
+#define go_home 3
+#define finished 4
 #define PI 3.1415926535897932384626433832795
 Beep_c Buzzer;
 Robot_actions_c Actions;
 Motors_c Motors;
-Kinematics_c Kin;
 
-int state = state_find_line;
-int lost_line = 0;
-bool double_backed = true;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -37,60 +34,106 @@ void setup() {
   Buzzer.buzz(1911,100);
   Buzzer.buzz(1517,100);
 
-  unsigned long t0 = millis();
-  while (millis()-t0 < 5000){
-    Kin.update();
-  }
-  Buzzer.buzz(1911,100);
-  float theta_1 = atan2(Kin.Y,Kin.X);
-  float dist_to_home = sqrt(pow(Kin.X,2)+pow(Kin.Y,2));
-  Actions.turn_theta_rad(PI+theta_1);
-  delay(200);
-  Kin.theta = Kin.theta + PI;
-  Kin.update();
-  
-  Actions.reset_count();
-  float min_dist = sqrt(sq(Kin.X)+sq(Kin.Y));
-  while(min_dist <= sqrt(sq(Kin.X)+sq(Kin.Y))){
-      /*
-      Serial.print(min_dist);
-      Serial.print(" ,");
-      Serial.println(sqrt(sq(Kin.X)+sq(Kin.Y)));*/
-      if (min_dist >= sqrt(sq(Kin.X)+sq(Kin.Y))) {
-        min_dist = sqrt(sq(Kin.X)+sq(Kin.Y));
-      }
-      else {break;}
-      Kin.update();
-      Actions.go_straight();
-  }
-          Motors.L_speedo = 0;
-        Motors.R_speedo = 0;
-      
-        Motors.update_motors();
 }
-
-
-
+float last_theta = 0;
+int state = state_find_line;
+int lost_line = 0;
+bool double_backed = true;
+unsigned long time_lost_line = millis();
+float X_limit = 450;
+float new_theta;
 void loop() {
+  /*
+  while (last_theta > 2*PI) {
+    last_theta = last_theta - (2*PI);
 
+  }*/
+    Actions.Kin.update();
 
-
-
-
-
-  
-/*
-    Serial.print(state);
-    Serial.println(",");
-  if (state == state_find_line) {
-      Actions.go_straight();   
+    if (state == state_find_line) {
+      
+      Actions.go_straight(last_theta);
+      
       if (Actions.check_for_line() == true) {
         state = state_follow_line;
+      }
+
+      if (double_backed == false && millis()-time_lost_line > 750 && Actions.Kin.X < X_limit) {
+
+        new_theta = Actions.turn_theta_rad(last_theta+PI);
+
+        last_theta = new_theta;
+        double_backed = true;
+      }
+
+      if (Actions.Kin.X > X_limit) {
+        Motors.L_speedo = 0;
+        Motors.R_speedo = 0;
+        Motors.update_motors();
+        state = go_home;
+      }
+    }
+
+    
+    if (state == state_follow_line) {
+          Actions.follow_line();
+
+      if (Actions.check_for_line() == false) {
+        state = state_find_line;
+        last_theta = Actions.Kin.theta;
+        time_lost_line = millis();
+        double_backed = false;
+        Buzzer.buzz(2500,50);
+      }
+    
+    }
+
+
+    if (state == go_home) {
+
+      //Actions.go_back_home();
+       Actions.Kin.update();
         
+
+        delay(1000);
+        Buzzer.buzz(1200,100);
+        Buzzer.buzz(1000,100);
+        Buzzer.buzz(800,100);
+        
+        float theta_1 = atan2(Actions.Kin.Y,Actions.Kin.X);
+        new_theta = Actions.turn_theta_rad(PI+theta_1);
+        delay(200);
+        Buzzer.buzz(1200,100);
+        Buzzer.buzz(1000,100);
+        while (Actions.Kin.X >0){
+          Actions.go_straight(new_theta);
+        }
+        Motors.L_speedo = 0;
+        Motors.R_speedo = 0;
+        Motors.update_motors();
+       state = finished;
+    }
+
+     
+    
+   
+
+    if (state == finished) {
+      
+    Buzzer.buzz(1911,100);
+    Buzzer.buzz(1517,200);
+    Buzzer.buzz(1911,100);
+    }
+
+}
+    /*
+  if (state == state_find_line) {
+      Actions.go_straight(last_theta);   
+      if (Actions.check_for_line() == true) {
+        state = state_follow_line;
       }
       if (double_backed == false && millis()-Actions.lost_line_time >1000) {
-        Actions.turn_on_spot();
-        double_backed = true;
+        state = state_double_back;
       }
   }
   
@@ -100,6 +143,7 @@ void loop() {
     if (Actions.check_for_line() == false) {
         state = state_find_line;
         Actions.reset_count();
+        last_theta = Kin.theta;
         double_backed = false;
       }
       
@@ -107,14 +151,17 @@ void loop() {
   
   
   if (state == state_double_back) {
-    Actions.turn_theta_degrees(180);
-    if (Actions.check_for_line() == true) {
-        state = state_follow_line;
-
-      }
+    last_theta = Kin.theta;
+    Actions.turn_theta_rad(last_theta+PI);
+    last_theta = last_theta+PI;
+    Kin.update();
+    
+    double_backed = true;
+    last_theta = Kin.theta;
+    state = state_find_line;
+     
   }
-      
+      */
     
-    */
     
-  } 
+  
