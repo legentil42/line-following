@@ -1,4 +1,4 @@
-#%%
+#%%#
 import time
 import serial
 import matplotlib
@@ -23,18 +23,18 @@ width, height = 1000, 600
 screen = pygame.display.set_mode((width, height))
 brown = [255, 255, 150]
 white = [255,255,255]
-arduino = serial.Serial('COM8',9600) # set your COM port here
+arduino = serial.Serial('COM7',9600) # set your COM port here
 time.sleep(1)
 
 while True:
    
     sys.stdout.write('\r')
     text = str(arduino.readline())
-
+    theta = float(text.split(",")[2].split('\\')[0])
     X =float(text.split(",")[0][2:])
     Y =float(text.split(",")[1])
     old_theta = theta
-    theta = float(text.split(",")[2].split('\\')[0])
+    
     
     sys.stdout.write(str(X) + " ")
     sys.stdout.write(str(Y) + " ")
@@ -55,11 +55,12 @@ while True:
    
     screen.blit(image_rotated, (X, Y))
     pygame.display.flip()
-    fpsClock.tick(fps)
+    #fpsClock.tick(fps)
 
     
    #sys.stdout.write(str(float(text.split(",")[0][2:]))+" "+str(float(text.split(",")[1])) + " " + str(float(text.split(",")[2][:-6]))+"\n")
 
    
+
 
 # %%

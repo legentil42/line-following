@@ -1,4 +1,5 @@
 {
     "board": "arduino:avr:leonardo",
-    "sketch": "LS3\\LS3.ino"
+    "sketch": "TB1\\dev\\dev.ino",
+    "port": "COM9"
 }

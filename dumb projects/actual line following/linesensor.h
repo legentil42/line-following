@@ -1,7 +1,7 @@
 // this #ifndef stops this file
 // from being included mored than
 // once by the compiler. 
-
+#ifndef _LINESENSOR_H
 #define _LINESENSOR_H
 #define EMIT_PIN 11
 #define DN2_PIN 18
@@ -140,3 +140,7 @@ class LineSensor_c {
 
 
 };
+
+
+
+#endif
