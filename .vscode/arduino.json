@@ -1,5 +1,5 @@
 {
     "board": "arduino:avr:leonardo",
-    "sketch": "TB1\\dev\\dev.ino",
-    "port": "COM9"
+    "sketch": "dumb projects\\control_crypt_with_robot\\main\\main.ino",
+    "port": "COM7"
 }
