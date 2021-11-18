@@ -1,21 +1,13 @@
 
-#include "beep.h"
-#include "motors.h"
 #include "encoders.h"
-#include "robot_actions.h"
 #include "kinematics.h"
 #define BAUD_RATE 9600
 #define state_find_line 0
 #define state_follow_line 1
 #define state_double_back 2
-#include "pid.h"
-#include "linesensor.h"
 #define BAUD_RATE 9600
 
 #define PI 3.1415926535897932384626433832795
-Beep_c Buzzer;
-Robot_actions_c Actions;
-Motors_c Motors;
 
 
 Kinematics_c Kin;
@@ -29,9 +21,6 @@ void setup() {
   Serial.println("***RESET***");
   setupEncoder0();
   setupEncoder1();
-  delay(500);
-  Buzzer.buzz(1911,100);
-  Buzzer.buzz(1517,100);
 
   delay(1000);
 
@@ -40,16 +29,16 @@ void setup() {
 
 void loop() {
     Kin.update();
-    Actions.Sensors.update_readings();
-    Serial.println(Actions.Sensors.DN3_VALUE);
+    //Actions.Sensors.update_readings();
+    //Serial.println(Actions.Sensors.DN3_VALUE);
     
-    /*
-    Serial.print( Kin.X);
+    
+    Serial.print(Kin.X);
     Serial.print(",");
     Serial.print(Kin.Y);
     Serial.print(",");
     Serial.println(Kin.theta);
-*/
+
     delay(17);
   }
       
